@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
@@ -12,20 +15,22 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  console.log(process.env);
+
   app.use(
     session({
-      name: 'NESTJS_AUTH_SESSION',
-      secret: 'test',
+      name: process.env.SESSION_NAME,
+      secret: process.env.SESSION_SECRET,
       resave: true,
       saveUninitialized: false,
       cookie: {
-        maxAge: 60000,
+        maxAge: 60000, // 1min
       },
       store: new TypeormStore().connect(sessionRepository),
     }),
   );
   app.use(passport.initialize());
   app.use(passport.session());
-  await app.listen(5001);
+  await app.listen(process.env.PORT);
 }
 bootstrap();
